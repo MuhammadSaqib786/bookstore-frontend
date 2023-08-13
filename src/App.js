@@ -6,10 +6,12 @@ import BookList from './BookList';
 function App() {
     const [books, setBooks] = useState([]);
     const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
+    const [price, setPrice] = useState('');
     const [author, setAuthor] = useState('');
     const [category, setCategory] = useState('');
     const [error, setError] = useState(null);
+    const [editMode, setEditMode] = useState(false);
+    const [currentBookId, setCurrentBookId] = useState(null);
 
     useEffect(() => {
         fetchBooks();
@@ -24,20 +26,33 @@ function App() {
         }
     };
 
-    const addBook = async () => {
+    const addOrUpdateBook = async () => {
+        setError("");
         try {
-            const newBook = { 
+            const bookData = { 
                 bookName: title, 
-                description, 
+                price: parseFloat(price),  // Convert the price string to a float
                 author, 
                 category 
             };
-            await axios.post('http://localhost:5259/api/Books', newBook);
+            if (editMode) {
+                await axios.put(`http://localhost:5259/api/Books/${currentBookId}`, bookData);
+                setEditMode(false);
+                setCurrentBookId(null);
+            } else {
+                await axios.post('http://localhost:5259/api/Books', bookData);
+            }
+            setTitle('');           // Resetting the title
+            setPrice('');           // Resetting the price
+            setAuthor('');
+            setCategory('');
             fetchBooks();
         } catch (err) {
-            setError("Failed to add the book. Please try again.");
+            console.error("API Error:", err.response ? err.response.data : err.message);  // Log the error
+            setError("Failed to add/update the book. Please try again.");
         }
     };
+    
 
     const deleteBook = async (id) => {
         try {
@@ -46,6 +61,16 @@ function App() {
         } catch (err) {
             setError("Failed to delete the book. Please try again.");
         }
+    };
+    
+
+    const startEditBook = (book) => {
+        setTitle(book.bookName);
+        setPrice(book.price);
+        setAuthor(book.author);
+        setCategory(book.category);
+        setEditMode(true);
+        setCurrentBookId(book.id);
     };
 
     const theme = createTheme();
@@ -92,9 +117,9 @@ function App() {
                                 <Grid item xs={12} md={3}>
                                     <TextField
                                         fullWidth
-                                        label="Description"
-                                        value={description}
-                                        onChange={e => setDescription(e.target.value)}
+                                        label="Price"
+                                        value={price}
+                                        onChange={e => setPrice(e.target.value)}
                                         variant="outlined"
                                     />
                                 </Grid>
@@ -102,17 +127,17 @@ function App() {
                                     <Button
                                         variant="contained"
                                         color="primary"
-                                        onClick={addBook}
+                                        onClick={addOrUpdateBook}
                                         fullWidth
                                     >
-                                        Add Book
+                                        {editMode ? 'Update Book' : 'Add Book'}
                                     </Button>
                                 </Grid>
                             </Grid>
                         </Paper>
                     </Grid>
                     <Grid item xs={12}>
-                        <BookList books={books} onDelete={deleteBook} />
+                        <BookList books={books} onDelete={deleteBook} onEdit={startEditBook} />
                     </Grid>
                 </Grid>
             </Container>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, Typography, Button } from '@mui/material';
 
-function Book({ book, onDelete }) {
+function Book({ book, onDelete, onEdit }) {
     return (
         <Card style={{ margin: '20px' }}>
             <CardContent>
@@ -10,6 +10,7 @@ function Book({ book, onDelete }) {
                 <Typography variant="body2" color="textSecondary">Category: {book.category}</Typography>
                 <Typography variant="body2" gutterBottom>Price: ${book.price}</Typography>
                 <Button color="secondary" onClick={() => onDelete(book.id)}>Delete</Button>
+                <Button color="primary" onClick={() => onEdit(book)}>Edit</Button>
             </CardContent>
         </Card>
     );
