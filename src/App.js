@@ -48,11 +48,9 @@ function App() {
             setCategory('');
             fetchBooks();
         } catch (err) {
-            console.error("API Error:", err.response ? err.response.data : err.message);  // Log the error
             setError("Failed to add/update the book. Please try again.");
         }
     };
-    
 
     const deleteBook = async (id) => {
         try {
@@ -62,11 +60,10 @@ function App() {
             setError("Failed to delete the book. Please try again.");
         }
     };
-    
 
     const startEditBook = (book) => {
         setTitle(book.bookName);
-        setPrice(book.price);
+        setPrice(book.price.toString());
         setAuthor(book.author);
         setCategory(book.category);
         setEditMode(true);
@@ -79,15 +76,15 @@ function App() {
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <Container>
-                <Grid container spacing={3} style={{ marginTop: '20px' }}>
-                    <Grid item xs={12}>
-                        <Typography variant="h4" align="center">Bookstore</Typography>
-                        {error && <Alert severity="error">{error}</Alert>}
-                    </Grid>
-                    <Grid item xs={12}>
+                <Typography variant="h4" align="center" style={{ marginTop: '20px', marginBottom: '20px' }}>Bookstore</Typography>
+                {error && <Alert severity="error">{error}</Alert>}
+                <Grid container spacing={3}>
+                    {/* Form Grid */}
+                    <Grid item xs={12} md={6}>
                         <Paper style={{ padding: '20px' }}>
+                            <Typography variant="h6" align="center">Add or Edit Book</Typography>
                             <Grid container spacing={2}>
-                                <Grid item xs={12} md={3}>
+                                <Grid item xs={12}>
                                     <TextField
                                         fullWidth
                                         label="Title"
@@ -96,7 +93,7 @@ function App() {
                                         variant="outlined"
                                     />
                                 </Grid>
-                                <Grid item xs={12} md={3}>
+                                <Grid item xs={12}>
                                     <TextField
                                         fullWidth
                                         label="Author"
@@ -105,7 +102,7 @@ function App() {
                                         variant="outlined"
                                     />
                                 </Grid>
-                                <Grid item xs={12} md={3}>
+                                <Grid item xs={12}>
                                     <TextField
                                         fullWidth
                                         label="Category"
@@ -114,7 +111,7 @@ function App() {
                                         variant="outlined"
                                     />
                                 </Grid>
-                                <Grid item xs={12} md={3}>
+                                <Grid item xs={12}>
                                     <TextField
                                         fullWidth
                                         label="Price"
@@ -136,8 +133,12 @@ function App() {
                             </Grid>
                         </Paper>
                     </Grid>
-                    <Grid item xs={12}>
-                        <BookList books={books} onDelete={deleteBook} onEdit={startEditBook} />
+                    {/* Books List Grid */}
+                    <Grid item xs={12} md={6}>
+                        <Paper style={{ padding: '20px', height: '100%' }}>
+                            <Typography variant="h6" align="center">Books List</Typography>
+                            <BookList books={books} onDelete={deleteBook} onEdit={startEditBook} />
+                        </Paper>
                     </Grid>
                 </Grid>
             </Container>
